@@ -1,0 +1,7 @@
+import javax.swing.*;
+import java.awt.*;
+
+public class Buttons extends JButton implements ActionListener{
+  
+  ImageIcon b;
+  int value

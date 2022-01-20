@@ -1,0 +1,102 @@
+ 
+  public class Clicks implements MouseListener{
+  
+  private SweeperBoard board;
+  private MineSweeper game;
+  private JLabel label;
+  private JLabel[][] grid;
+  private int row, col;
+  private int prox;
+  private String position;
+  
+  
+  private boolean gameWon = false;
+  
+  public Clicks(SweeperBoard board){
+    
+  
+    this.board = board;
+    
+    
+    
+    board.addListener(this);
+    
+  }//Actions Constructor
+  
+  
+  
+  public void mouseClicked(MouseEvent event){
+    
+    if(board.gameEnd != true){
+      JLabel label = (JLabel) event.getComponent();
+      row = board.getRow(label);
+      col = board.getCol(label);
+      
+    }
+    position = board.getPosition(row,col);
+    prox = board.getProx(position, row, col);
+    
+    if(SwingUtilities.isLeftMouseButton(event)){
+      
+      
+      if(gameWon == true){
+        board.displayArea.setText("You have already lost");
+      }
+      else if(board.cells[row][col].isCovered() == false){
+        board.displayArea.setText("You have already checked there");
+        
+      }
+      else if(board.cells[row][col].isMine() == true){
+        board.displayArea.setText("GAME OVER! - You lose");
+        board.revealBoard();
+      }
+      else if(prox == 0){
+        
+        board.revealProx(position,row,col);
+        label.setText(Integer.toString(prox));
+      }
+      else if(prox > 0){
+        
+        label.setText(Integer.toString(prox));
+        board.revealSpot(row,col);
+        
+        
+        
+      }//SweepingAreas
+      
+      
+      
+      
+      
+    }//Reveals
+       
+       else if(SwingUtilities.isRightMouseButton(event)){
+         
+         
+         
+       }//Flags
+               
+               
+               }
+  
+  
+  
+  
+  
+  public void mousePressed(MouseEvent event){
+    
+  }
+  public void mouseReleased(MouseEvent event){
+    
+  }
+  public void mouseEntered(MouseEvent event){
+    
+  }
+  public void mouseExited(MouseEvent event){
+    
+  }
+  
+  
+  }
+ 
+}

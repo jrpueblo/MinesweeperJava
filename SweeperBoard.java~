@@ -1,0 +1,616 @@
+import java.util.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+
+public class SweeperBoard extends JFrame implements Runnable{
+ 
+  private final int BOARD_LENGTH = 8;
+  private final int BOARD_WIDTH = 8;
+  private final int boardSize = BOARD_LENGTH * BOARD_WIDTH;
+  private Cell[][] cells;
+  private JFrame frame;
+  private JLabel[][] grid;
+  private JLabel mineTitle, mineCount, gameTime, timeTitle, displayArea;
+  private JPanel field;
+  private JPanel menu;
+  private boolean complete = false;
+  private int count, minesLeft, flagsLeft, extraFlags;
+  private int mineNum = 40;
+  private int flags = 40;
+  private String name;
+  private boolean gameEnd = false;
+ 
+ 
+ 
+  public SweeperBoard(){
+   
+    IntializeGUI();
+   
+  }//SweeperBoard Constructor
+  
+      
+     public void run(){
+      try{
+        
+    SweeperBoard board = new SweeperBoard();
+    board.getFrame().setVisible(true);
+    MineSweeper game = new MineSweeper();
+    Actions listener = new Actions(game, board);
+    
+      }
+      catch(Exception e){
+        
+        e.printStackTrace();
+      }
+    }
+     
+ 
+ 
+  public void IntializeGUI(){
+   
+    Scanner sc = new Scanner(System.in);
+    System.out.println("Please enter your name");
+    name = "Jan";
+   
+    //Intialize the Frame
+   
+    frame = new JFrame("MineSweeper");
+    frame.setBounds(0, 0, 630, 700);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setResizable(false);
+    frame.getContentPane().setLayout(null);
+    frame.setVisible(true);
+   
+   
+   
+    //Intialize game Panel
+    field = new JPanel();
+    field.setBounds(10, 10, 600, 600);
+    field.setLayout(new GridLayout(BOARD_LENGTH, BOARD_WIDTH, 0, 0));
+    frame.getContentPane().add(field);
+   
+    cells = new Cell[BOARD_LENGTH][BOARD_WIDTH];
+    grid = new JLabel[BOARD_LENGTH][BOARD_WIDTH];
+   
+    //Intialize Grid of Jlabel and add to panel
+    for(int row = 0; row < BOARD_LENGTH;row++){
+      for(int col = 0; col < BOARD_WIDTH;col++){
+        grid[row][col] = new JLabel();
+        grid[row][col].setBorder(BorderFactory.createLineBorder(Color.black, 2));
+        grid[row][col].setHorizontalAlignment(SwingConstants.CENTER);
+        field.add(grid[row][col]);
+      }
+    }
+   
+    //Intialize title for Mine label
+    mineTitle = new JLabel("Mines");
+    mineTitle.setBounds(10, 620, 40, 20);
+    mineTitle.setHorizontalAlignment(SwingConstants.CENTER);
+    mineTitle.setVerticalAlignment(SwingConstants.BOTTOM);
+    mineTitle.setFont(new Font("Calibri", Font.BOLD, 10));
+    frame.getContentPane().add(mineTitle);
+   
+    //Intialize Jlabel to display Mines
+    mineCount = new JLabel(Integer.toString(mineNum));
+    mineCount.setBounds(10, 640, 40, 20);
+    mineCount.setHorizontalAlignment(SwingConstants.CENTER);
+    mineCount.setFont(new Font("Calibri", Font.BOLD, 20));
+    frame.getContentPane().add(mineCount);
+   
+    //Intialize text area
+    displayArea = new JLabel("Welcome " + name + ", to MineSweeper");
+    displayArea.setBounds(60, 620, 390, 40);
+    displayArea.setHorizontalAlignment(SwingConstants.CENTER);
+    displayArea.setFont(new Font("Calibri", Font.PLAIN, 20));
+    frame.getContentPane().add(displayArea);
+   
+   
+   
+    for(int row = 0; row < BOARD_LENGTH;row++){
+      for(int col = 0; col < BOARD_WIDTH;col++){
+       
+        cells[row][col] = new Cell();
+       
+      }
+    }
+   
+    setMines(mineNum);
+    setNums();
+   
+   
+   
+  }//IntializeGUI
+ 
+  public JFrame getFrame(){
+   
+    return frame;
+   
+  }//getFrame
+ 
+  public void setMines(int count){
+   
+   
+   
+    int tempRow, tempCol;
+   
+    for(int i = 0; i < count;i++){
+      tempRow = (int)((7) * Math.random());
+      tempCol = (int)((7) * Math.random());
+     
+      if(cells[tempRow][tempCol].isMine() != true)
+        cells[tempRow][tempCol].setMine();
+      else
+        i--;
+     
+    }
+   
+   
+   
+  }//setMines
+ 
+  public void setNums(){
+   
+    for(int x = 0; x < BOARD_LENGTH;x++){
+      for(int y = 0; y < BOARD_WIDTH;y++){
+       
+        count = 0;
+       
+        if (x > 0 &&  y > 0 && cells[x - 1][y - 1].isMine())
+          count++;
+       
+        if (y > 0 && cells[x][y - 1].isMine())
+          count++;
+       
+        if (x < BOARD_WIDTH - 1 && y > 0 && cells[x + 1][y - 1].isMine())
+          count++;
+       
+        if (x > 0 && cells[x - 1][y].isMine())
+          count++;
+       
+        if (x < BOARD_WIDTH - 1 && cells[x + 1][y].isMine())
+          count++;
+       
+        if (x > 0 && y < BOARD_LENGTH - 1 && cells[x - 1][y + 1].isMine())
+          count++;
+       
+        if (y < BOARD_LENGTH - 1 && cells[x] [y + 1].isMine())
+          count++;
+       
+        if (x < BOARD_WIDTH - 1 && y < BOARD_LENGTH - 1 && cells[x + 1][y + 1].isMine())
+          count++;
+       
+       
+        cells[x][y].setNum(count);
+      }
+    }
+   
+   
+   
+  }//setNums
+ 
+  public int getRow(JLabel label){
+   
+    int returnRow = -1;
+   
+    for(int row = 0; row < 25; row++){
+      for(int column = 0; column < 25; column++){
+        if(grid[row][column] == label)
+          returnRow = row;
+      }//column
+    }//row
+   
+    return returnRow;
+  }//getRow()
+ 
+  public int getCol(JLabel label){
+   
+    int returnCol = -1;
+   
+    for(int row = 0; row < BOARD_LENGTH; row++){
+      for(int col = 0; col < BOARD_WIDTH; col++){
+        if(grid[row][col] == label)
+          returnCol = col;
+      }//column
+    }//row
+   
+    return returnCol;
+  }//getRow()
+ 
+  public void addListener(MouseListener listener){
+   
+    for(int x = 0; x < BOARD_LENGTH;x++){
+      for(int y = 0; y < BOARD_WIDTH;y++){
+       
+        grid[x][y].addMouseListener(listener);
+       
+      }
+    }
+  }
+ 
+  public String getPosition(int row, int col){
+   
+    String position = " ";
+   
+    if((row > 0 && row < BOARD_LENGTH - 1) && (col > 0 && col < BOARD_WIDTH - 1))
+      position = "open"; //no walls surrounding
+   
+    else if(row == 0 && (col > 0 && col < BOARD_WIDTH - 1))
+      position = "Top";
+   
+    else if(row == BOARD_LENGTH - 1 && (col > 0 && col < BOARD_LENGTH - 1))
+      position = "Bottom";
+   
+    else if((row > 0 && row < BOARD_LENGTH - 1) && col == BOARD_WIDTH - 1)
+      position = "Right";
+   
+    else if((row > 0 && row < BOARD_LENGTH - 1) && col == 0)
+      position = "Left";
+   
+    else if(row == 0 && col == 0)
+      position = "TopLeft";
+   
+    else if(row == 0 && col == BOARD_WIDTH - 1)
+      position = "TopRight";
+   
+    else if(row == BOARD_LENGTH - 1 && col == 0)
+      position = "BottomLeft";
+   
+    else if(row == BOARD_LENGTH - 1 && col == BOARD_WIDTH - 1)
+      position = "BottomRight";
+   
+    return position;
+   
+  }//findPositionSituation
+ 
+  public int getProx(String position, int row, int col){
+   
+    int prox = 0;
+   
+    if(position.equals("Open")){
+      if(cells[row - 1][col - 1].isMine())
+        prox++;
+     
+      if(cells[row - 1][col].isMine())
+        prox++;
+     
+      if(cells[row - 1][col + 1].isMine())
+        prox++;
+     
+      if(cells[row][col + 1].isMine())
+        prox++;
+     
+      if(cells[row + 1][col + 1].isMine())
+        prox++;
+     
+      if(cells[row + 1][col].isMine())
+        prox++;
+     
+      if(cells[row + 1][col - 1].isMine())
+        prox++;
+     
+      if(cells[row][col - 1].isMine())
+        prox++;
+     
+    }//free
+   
+    else if(position.equals("Top")){
+      if(cells[row][col + 1].isMine())
+        prox++;
+     
+      if(cells[row + 1][col + 1].isMine())
+        prox++;
+     
+      if(cells[row + 1][col].isMine())
+        prox++;
+     
+      if(cells[row + 1][col - 1].isMine())
+        prox++;
+     
+      if(cells[row][col - 1].isMine())
+        prox++;
+     
+    }//sideTop
+   
+    else if(position.equals("Bottom")){
+      if(cells[row][col - 1].isMine())
+        prox++;
+     
+      if(cells[row - 1][col - 1].isMine())
+        prox++;
+     
+      if(cells[row - 1][col].isMine())
+        prox++;
+     
+      if(cells[row - 1][col + 1].isMine())
+        prox++;
+     
+      if(cells[row][col + 1].isMine())
+        prox++;
+     
+    }//sideBottom
+   
+    else if(position.equals("Left")){
+      if(cells[row - 1][col].isMine())
+        prox++;
+     
+      if(cells[row - 1][col + 1].isMine())
+        prox++;
+     
+      if(cells[row][col + 1].isMine())
+        prox++;
+     
+      if(cells[row + 1][col + 1].isMine())
+        prox++;
+     
+      if(cells[row + 1][col].isMine())
+        prox++;
+     
+    }//sideLeft
+   
+    else if(position.equals("Right")){
+      if(cells[row - 1][col].isMine())
+        prox++;
+     
+      if(cells[row + 1][col].isMine())
+        prox++;
+     
+      if(cells[row + 1][col - 1].isMine())
+        prox++;
+     
+      if(cells[row][col - 1].isMine())
+        prox++;
+     
+      if(cells[row - 1][col - 1].isMine())
+        prox++;
+     
+    }//sideRight
+   
+    else if(position.equals("TopLeft")){
+      if(cells[row][col + 1].isMine())
+        prox++;
+     
+      if(cells[row + 1][col + 1].isMine())
+        prox++;
+     
+      if(cells[row + 1][col].isMine())
+        prox++;
+     
+    }//cornerTopLeft
+   
+    else if(position.equals("TopRight")){
+      if(cells[row + 1][col].isMine())
+        prox++;
+     
+      if(cells[row + 1][col - 1].isMine())
+        prox++;
+     
+      if(cells[row][col - 1].isMine())
+        prox++;
+     
+    }//cornerTopRight
+   
+    else if(position.equals("BottomLeft")){
+      if(cells[row - 1][col].isMine())
+        prox++;
+     
+      if(cells[row - 1][col + 1].isMine())
+        prox++;
+     
+      if(cells[row][col + 1].isMine())
+        prox++;
+     
+    }//cornerBottomLeft
+   
+    else if(position.equals("BottomRight")){
+      if(cells[row - 1][col].isMine())
+        prox++;
+     
+      if(cells[row][col - 1].isMine())
+        prox++;
+     
+      if(cells[row - 1][col - 1].isMine())
+        prox++;
+     
+    }//cornerBottomRight
+   
+    return prox;
+   
+   
+  }//getProx
+ 
+ 
+ 
+  public void revealProx(String position, int row, int col){
+   
+    if(cells[row][col].getNum() >= 1){
+      cells[row][col].reveal();
+      return;
+    }else if(position.equals("Open")){
+      revealProx(getPosition(row - 1, col - 1), (row - 1),(col - 1));   //top left
+      revealProx(getPosition(row - 1, col),(row - 1),(col));            //top
+      revealProx(getPosition(row - 1, col + 1),(row - 1),(col + 1));    //top right
+      revealProx(getPosition(row + 1, col + 1),(row + 1),(col + 1));    //bottom right
+      revealProx(getPosition(row + 1, col),(row + 1),(col));            //bottom
+      revealProx(getPosition(row + 1, col - 1),(row + 1),(col - 1));    //bottom left
+      revealProx(getPosition(row, col - 1),(row),(col - 1));            //left
+      revealProx(getPosition(row, col + 1),(row),(col + 1));            //right
+     
+    }else if(position.equals("Top")){
+      revealProx(getPosition(row, col + 1),(row),(col + 1));            //right
+      revealProx(getPosition(row + 1, col + 1),(row + 1),(col + 1));    //bottom right
+      revealProx(getPosition(row + 1, col),(row + 1),(col));            //bottom
+      revealProx(getPosition(row + 1, col - 1),(row + 1),(col - 1));    //bottom left
+      revealProx(getPosition(row, col - 1),(row),(col - 1));            //left
+     
+    }else if(position.equals("Bottom")){
+      revealProx(getPosition(row - 1, col - 1), (row - 1),(col - 1));   //top left
+      revealProx(getPosition(row - 1, col),(row - 1),(col));            //top
+      revealProx(getPosition(row - 1, col + 1),(row - 1),(col + 1));    //top right
+      revealProx(getPosition(row, col + 1),(row),(col + 1));            //right
+      revealProx(getPosition(row, col - 1),(row),(col - 1));            //left
+     
+    }else if(position.equals("Right")){
+      revealProx(getPosition(row - 1, col - 1), (row - 1),(col - 1));   //top left
+      revealProx(getPosition(row - 1, col),(row - 1),(col));            //top
+      revealProx(getPosition(row + 1, col),(row + 1), (col));           //bottom
+      revealProx(getPosition(row, col - 1),(row),(col - 1));            //left
+      revealProx(getPosition(row + 1, col - 1),(row + 1),(col - 1));    //bottom left
+     
+    }else if(position.equals("Left")){
+      revealProx(getPosition(row - 1, col),(row - 1),(col));            //top
+      revealProx(getPosition(row - 1, col + 1),(row - 1),(col + 1));    //top right
+      revealProx(getPosition(row + 1, col + 1),(row + 1),(col + 1));    //bottom right
+      revealProx(getPosition(row + 1, col),(row + 1),(col));            //bottom
+      revealProx(getPosition(row, col + 1),(row),(col + 1));            //right
+     
+    }else if(position.equals("TopLeft")){
+      revealProx(getPosition(row + 1, col + 1),(row + 1),(col + 1));    //bottom right
+      revealProx(getPosition(row + 1, col),(row + 1),(col));            //bottom
+      revealProx(getPosition(row, col + 1),(row),(col + 1));            //right
+     
+    }else if(position.equals("TopRight")){
+      revealProx(getPosition(row + 1, col),(row + 1), (col));           //bottom
+      revealProx(getPosition(row, col - 1),(row),(col - 1));            //left
+      revealProx(getPosition(row + 1, col - 1),(row + 1),(col - 1));    //bottom left
+     
+    }else if(position.equals("BottomLeft")){
+     revealProx(getPosition(row - 1, col),(row - 1),(col));            //top
+     revealProx(getPosition(row - 1, col + 1),(row - 1),(col + 1));    //top right
+     revealProx(getPosition(row, col + 1),(row),(col + 1));            //right
+     
+    }else if(position.equals("BottomRight")){
+      revealProx(getPosition(row - 1, col - 1), (row - 1),(col - 1));   //top left
+      revealProx(getPosition(row - 1, col),(row - 1),(col));            //top
+       revealProx(getPosition(row, col - 1),(row),(col - 1));            //left
+       
+    }
+   
+   
+  }//revealProx
+
+ 
+  public boolean checkGameOver(){
+   
+    int minesFlagged = mineNum;
+    boolean gameWon = false;
+   
+    for(int row = 0; row < BOARD_LENGTH;row++){
+      for(int col = 0; col < BOARD_WIDTH;col++){
+        if(cells[row][col].isFlagged() && cells[row][col].isMine() == true)
+          minesFlagged--;
+        else
+          extraFlags++;
+       
+      }
+    }
+   
+    if(minesFlagged == 0 && extraFlags == 0)
+      gameWon = true;
+   
+   
+    return gameWon;
+   
+   
+  }//checkGameOver
+ 
+  public void setColours(){
+   
+    for(int row = 0; row < BOARD_LENGTH; row++){
+      for(int column = 0; column < BOARD_WIDTH; column++){
+       
+        if(cells[row][column].getNum() == 0 && cells[row][column].isCovered() == false)
+          grid[row][column].setForeground(Color.LIGHT_GRAY);
+       
+        if(cells[row][column].getNum() == 1 && cells[row][column].isCovered() == false)
+          grid[row][column].setForeground(Color.BLUE);
+       
+        if(cells[row][column].getNum() == 2 && cells[row][column].isCovered() == false)
+          grid[row][column].setForeground(Color.GREEN.darker());
+       
+        if(cells[row][column].getNum() == 3 && cells[row][column].isCovered() == false)
+          grid[row][column].setForeground(Color.RED);
+       
+        if(cells[row][column].getNum() == 4 && cells[row][column].isCovered() == false)
+          grid[row][column].setForeground(Color.BLUE.darker());
+       
+        if(cells[row][column].getNum() == 5 && cells[row][column].isCovered() == false)
+          grid[row][column].setForeground(Color.RED.darker());
+       
+        if(cells[row][column].getNum() == 6 && cells[row][column].isCovered() == false)
+          grid[row][column].setForeground(Color.CYAN.darker());
+       
+        if(cells[row][column].getNum() == 7 && cells[row][column].isCovered() == false)
+          grid[row][column].setForeground(Color.BLACK.darker());
+       
+        if(cells[row][column].getNum() == 8 && cells[row][column].isCovered() == false)
+          grid[row][column].setForeground(Color.LIGHT_GRAY.darker());
+       
+      }//columns
+    }//row
+   
+  }//setColours()
+ 
+ 
+ 
+ 
+ 
+ 
+
+  private class Actions implements MouseListener{
+  
+    private SweeperBoard gui;
+    private MineSweeper game;
+  
+    private int row, col;
+    private int prox;
+    private String position;
+  
+    private boolean gameWon = false;
+  
+    public Actions(MineSweeper game, SweeperBoard gui){
+      this.game = game;
+      this.gui = gui;
+    
+      gui.addListener(this);
+    
+    }//Actions Constructor
+  
+  
+  
+    public void mouseClicked(MouseEvent event){
+    
+      if(gui.gameEnd != true){
+        JLabel label = (JLabel) event.getComponent();
+        row = gui.getRow(label);
+        col = gui.getCol(label);
+      
+      }
+      position = gui.getPosition(row,col);
+      prox = gui.getProx(position, row, col);
+    
+    
+    }
+  
+  
+  
+  
+  
+    public void mousePressed(MouseEvent event){
+    
+    }
+    public void mouseReleased(MouseEvent event){
+    
+    }
+    public void mouseEntered(MouseEvent event){
+    
+    }
+    public void mouseExited(MouseEvent event){
+    
+    }
+  
+  
+  }
+ 
+}//SweeperBoard

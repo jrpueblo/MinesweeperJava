@@ -47,14 +47,14 @@ public class Cell{
   }
  
    public void flag(){
-   
     isFlagged = true;
+    isCovered = false;
    
   }//Flag
    
    public void unFlag(){
-     
      isFlagged = false;
+     isCovered = true;
      
    }//unFlag
    

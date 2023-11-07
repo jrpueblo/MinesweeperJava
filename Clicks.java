@@ -38,7 +38,7 @@ public class Clicks implements MouseListener, MineSweeperConstants{
       
       if(SwingUtilities.isLeftMouseButton(event)){
         
-        if(board.cells[row][col].isMine() == true){
+        if(board.cells[row][col].isMine() == true && !board.cells[row][col].isCovered()){
           
           board.displayArea.setText("GAME OVER! - You lose");
           board.revealBoard();
@@ -59,11 +59,13 @@ public class Clicks implements MouseListener, MineSweeperConstants{
         
       }//Reveals
       
+      // Flag functionality
       else if(SwingUtilities.isRightMouseButton(event)){
         
-        if(flagsLeft == 0)
-          gameEnd = true;
+        System.out.println(flagsLeft);
+
         
+    
         if(flagsLeft > 0){
           
           if(board.cells[row][col].isCovered()){
@@ -97,11 +99,8 @@ public class Clicks implements MouseListener, MineSweeperConstants{
         if(flagsLeft == 0)
           gameEnd = true;
         
-         if(board.checkWin(flagsLeft) == true){
+        if(board.checkWin(flagsLeft) == true){
           board.displayArea.setText("Congrats " + board.name + "! You have won!");
-          
-        }else{
-          board.displayArea.setText("GAME OVER! - You lose");
         }
         
         

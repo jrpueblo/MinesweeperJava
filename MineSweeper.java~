@@ -1,7 +1,0 @@
-public class MineSweeper{
-  public static void main(String [] args){
-    
-    SweeperBoard board = new SweeperBoard();
-    
-  }//main
-}//MineSweeper
